@@ -1,150 +1,130 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Label Area Calculator</title>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Rectangle Area dApp</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.6.0/dist/ethers.umd.min.js"></script>
+</head>
 
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background: #eef2f7;
-        padding: 35px;
-        display: flex;
-        justify-content: center;
-      }
+<body>
+  <h1>Rectangle Area dApp</h1>
 
-      .card {
-        width: 420px;
-        padding: 25px;
-        background: white;
-        border-radius: 14px;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-      }
+  <button id="connectButton">Connect Wallet</button>
+  <br><br>
 
-      .label-box {
-        width: 100%;
-        padding: 28px 0;
-        text-align: center;
-        font-size: 30px;
-        font-weight: bold;
-        background: #e5f7ff;
-        border: 2px solid #bce7ff;
-        border-radius: 10px;
-        margin-bottom: 25px;
-      }
+  <label>Width:</label>
+  <input id="widthInput" type="number" min="1" placeholder="set - 240504528" />
+  <button id="setWidthButton">Set Width</button>
+  <br><br>
 
-      label {
-        font-weight: bold;
-        display: block;
-        margin-bottom: 6px;
-      }
+  <label>Height:</label>
+  <input id="heightInput" type="number" min="1" placeholder="set - 240504528" />
+  <button id="setHeightButton">Set Height</button>
+  <br><br>
 
-      .input-row {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 20px;
-      }
+  <button id="areaButton">Calculate Area</button>
 
-      input {
-        flex: 1;
-        font-size: 17px;
-        padding: 10px;
-        border-radius: 6px;
-        border: 1px solid #c9c9c9;
-      }
+  <h2 id="result"></h2>
 
-      button {
-        padding: 10px 14px;
-        font-size: 15px;
-        background: #0ea5e9;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: bold;
-      }
+<script>
+  const CONTRACT_ADDRESS = "0x4f3e29d89cadd007c997841f1f09fcb8e69ddd38";
 
-      button:hover {
-        background: #0284c7;
-      }
+  const ABI = [
+	{
+		"inputs": [{ "internalType": "uint256", "name": "h", "type": "uint256" }],
+		"name": "setHeight",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [{ "internalType": "uint256", "name": "w", "type": "uint256" }],
+		"name": "setWidth",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "area",
+		"outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getHeight",
+		"outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getWidth",
+		"outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+		"stateMutability": "view",
+		"type": "function"
+	}
+  ];
 
-      .row {
-        font-size: 19px;
-        margin: 10px 0;
-      }
-      .row span {
-        font-weight: bold;
-      }
-    </style>
-  </head>
+  let provider;
+  let signer;
+  let contract;
 
-  <body>
-    <div class="card">
-      <!-- LABEL BOX -->
-      <div class="label-box" id="labelBox">—</div>
+  document.getElementById("connectButton").onclick = async () => {
+    if (typeof window.ethereum !== "undefined") {
+      await ethereum.request({ method: "eth_requestAccounts" });
 
-      <!-- WIDTH -->
-      <label for="widthInput">Width (240504528)</label>
-      <div class="input-row">
-        <input type="number" id="widthInput" placeholder="Set Width 240504528" />
-        <button onclick="setWidth()">Set</button>
-      </div>
+      provider = new ethers.BrowserProvider(window.ethereum);
+      signer = await provider.getSigner();
+      contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
 
-      <!-- HEIGHT -->
-      <label for="heightInput">Height (240504528)</label>
-      <div class="input-row">
-        <input type="number" id="heightInput" placeholder="Set Height 240504528" />
-        <button onclick="setHeight()">Set</button>
-      </div>
+      alert("Wallet connected!");
+    } else {
+      alert("Please install MetaMask first.");
+    }
+  };
 
-      <!-- DISPLAY VALUES -->
-      <div class="row">Width: <span id="wVal">—</span></div>
-      <div class="row">Height: <span id="hVal">—</span></div>
-      <div class="row">Area: <span id="areaVal">—</span></div>
-    </div>
+  document.getElementById("setWidthButton").onclick = async () => {
+    const w = document.getElementById("widthInput").value;
+    if (!w || w <= 0) {
+      alert("Please enter a valid width > 0");
+      return;
+    }
+    try {
+      const tx = await contract.setWidth(w);
+      await tx.wait();
+      alert("Width set successfully!");
+    } catch (e) {
+      alert("Error: " + e);
+    }
+  };
 
-    <script>
-      const widthInput = document.getElementById("widthInput");
-      const heightInput = document.getElementById("heightInput");
+  document.getElementById("setHeightButton").onclick = async () => {
+    const h = document.getElementById("heightInput").value;
+    if (!h || h <= 0) {
+      alert("Please enter a valid height > 0");
+      return;
+    }
+    try {
+      const tx = await contract.setHeight(h);
+      await tx.wait();
+      alert("Height set successfully!");
+    } catch (e) {
+      alert("Error: " + e);
+    }
+  };
 
-      const labelBox = document.getElementById("labelBox");
-      const wVal = document.getElementById("wVal");
-      const hVal = document.getElementById("hVal");
-      const areaVal = document.getElementById("areaVal");
+  document.getElementById("areaButton").onclick = async () => {
+    try {
+      const a = await contract.area();
+      document.getElementById("result").innerText = "Area = " + a;
+    } catch (e) {
+      alert("Error: " + e);
+    }
+  };
 
-      // Auto updates
-      widthInput.addEventListener("input", calculate);
-      heightInput.addEventListener("input", calculate);
+</script>
 
-      function setWidth() {
-        calculate();
-      }
-
-      function setHeight() {
-        calculate();
-      }
-
-      function calculate() {
-        const w = widthInput.value;
-        const h = heightInput.value;
-
-        // Display width on label box
-        labelBox.textContent = w || "—";
-
-        // Display values
-        wVal.textContent = w || "—";
-        hVal.textContent = h || "—";
-
-        // Area calculation
-        if (w && h) {
-          const W = BigInt(w);
-          const H = BigInt(h);
-          const area = W * H;
-          areaVal.textContent = area.toString();
-        } else {
-          areaVal.textContent = "—";
-        }
-      }
-    </script>
-  </body>
+</body>
 </html>
