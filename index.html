@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Label Area Calculator</title>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #eef2f7;
+        padding: 35px;
+        display: flex;
+        justify-content: center;
+      }
+
+      .card {
+        width: 420px;
+        padding: 25px;
+        background: white;
+        border-radius: 14px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+      }
+
+      .label-box {
+        width: 100%;
+        padding: 28px 0;
+        text-align: center;
+        font-size: 30px;
+        font-weight: bold;
+        background: #e5f7ff;
+        border: 2px solid #bce7ff;
+        border-radius: 10px;
+        margin-bottom: 25px;
+      }
+
+      label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 6px;
+      }
+
+      .input-row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 20px;
+      }
+
+      input {
+        flex: 1;
+        font-size: 17px;
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid #c9c9c9;
+      }
+
+      button {
+        padding: 10px 14px;
+        font-size: 15px;
+        background: #0ea5e9;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+
+      button:hover {
+        background: #0284c7;
+      }
+
+      .row {
+        font-size: 19px;
+        margin: 10px 0;
+      }
+      .row span {
+        font-weight: bold;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="card">
+      <!-- LABEL BOX -->
+      <div class="label-box" id="labelBox">—</div>
+
+      <!-- WIDTH -->
+      <label for="widthInput">Width (240504528)</label>
+      <div class="input-row">
+        <input type="number" id="widthInput" placeholder="Set Width 240504528" />
+        <button onclick="setWidth()">Set</button>
+      </div>
+
+      <!-- HEIGHT -->
+      <label for="heightInput">Height (240504528)</label>
+      <div class="input-row">
+        <input type="number" id="heightInput" placeholder="Set Height 240504528" />
+        <button onclick="setHeight()">Set</button>
+      </div>
+
+      <!-- DISPLAY VALUES -->
+      <div class="row">Width: <span id="wVal">—</span></div>
+      <div class="row">Height: <span id="hVal">—</span></div>
+      <div class="row">Area: <span id="areaVal">—</span></div>
+    </div>
+
+    <script>
+      const widthInput = document.getElementById("widthInput");
+      const heightInput = document.getElementById("heightInput");
+
+      const labelBox = document.getElementById("labelBox");
+      const wVal = document.getElementById("wVal");
+      const hVal = document.getElementById("hVal");
+      const areaVal = document.getElementById("areaVal");
+
+      // Auto updates
+      widthInput.addEventListener("input", calculate);
+      heightInput.addEventListener("input", calculate);
+
+      function setWidth() {
+        calculate();
+      }
+
+      function setHeight() {
+        calculate();
+      }
+
+      function calculate() {
+        const w = widthInput.value;
+        const h = heightInput.value;
+
+        // Display width on label box
+        labelBox.textContent = w || "—";
+
+        // Display values
+        wVal.textContent = w || "—";
+        hVal.textContent = h || "—";
+
+        // Area calculation
+        if (w && h) {
+          const W = BigInt(w);
+          const H = BigInt(h);
+          const area = W * H;
+          areaVal.textContent = area.toString();
+        } else {
+          areaVal.textContent = "—";
+        }
+      }
+    </script>
+  </body>
+</html>
